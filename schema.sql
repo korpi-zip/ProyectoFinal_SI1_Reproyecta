@@ -1,0 +1,3 @@
+-- Esquema ya existente en la base de datos.
+-- Este archivo es solo de referencia.
+-- Las tablas fueron creadas manualmente con el esquema proporcionado.

@@ -1,0 +1,617 @@
+{
+  "name": "ReProyecta",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -128,
+        0
+      ],
+      "id": "ed1c4132-8250-4bf0-8d0c-f61808fdf11d",
+      "name": "Telegram Trigger",
+      "webhookId": "30afd5ad-546d-4618-89d6-fedd13c33846",
+      "credentials": {
+        "telegramApi": {
+          "id": "VXCzmp8UsYzY8zlb",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.photo }}",
+                    "rightValue": "Imagen",
+                    "operator": {
+                      "type": "array",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "567f7270-ac14-48be-a3c7-ba5b31d931b9"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Imagen"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "21a057b6-996a-496e-b76f-1cb61901faf3",
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Texto"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "27b3af6e-69ff-43c2-bacd-8b8348bd675c",
+                    "leftValue": "={{ $json.message.video }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Video"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "087265de-a5ff-4b88-9c38-e79310c63638",
+                    "leftValue": "={{ $json.message.voice }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        16,
+        -32
+      ],
+      "id": "a7e62243-4677-4ea3-9656-719d9f118737",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('Telegram Trigger').item.json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        192,
+        160
+      ],
+      "id": "ebd2459c-1b0b-48fb-9c9a-8bce03699a56",
+      "name": "Get a file",
+      "webhookId": "4b1b2e9a-47d4-4ae7-9cfd-5d182994ebd0",
+      "credentials": {
+        "telegramApi": {
+          "id": "VXCzmp8UsYzY8zlb",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Eres un asistente especializado en gestión de recursos para proyectos.\n\nEscucha el audio y determina qué desea hacer el usuario.\n\nPrimero transcribe el contenido.\n\nLuego identifica:\n\n- Recursos mencionados.\n- Cantidades.\n- Proyectos mencionados.\n- Consultas realizadas.\n- Acciones solicitadas.\n\nResponde utilizando el siguiente formato:\n\nTRANSCRIPCIÓN:\n(texto transcrito)\n\nINFORMACIÓN DETECTADA:\n(lista de elementos relevantes)\n\nNo inventes información que no haya sido mencionada.\n\nSi algo no es claro, indícalo explícitamente.",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        352,
+        160
+      ],
+      "id": "fa631ca7-eeb2-48ce-8195-9d5f7e06eebe",
+      "name": "Analyze audio",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "3vjKcJBNAyN77L0b",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.photo[0].file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        192,
+        -144
+      ],
+      "id": "217d1df7-8083-4fbb-9b84-3b5e8933de79",
+      "name": "Get a file1",
+      "webhookId": "9e937d57-e737-4781-8ad4-03af94a68421",
+      "credentials": {
+        "telegramApi": {
+          "id": "VXCzmp8UsYzY8zlb",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "text": "Eres un asistente especializado en inventarios de proyectos de ingeniería, robótica, electrónica, fabricación digital y laboratorios.\n\nAnaliza cuidadosamente la imagen recibida.\n\nTu objetivo es identificar:\n\n- Materiales.\n- Herramientas.\n- Componentes electrónicos.\n- Elementos mecánicos.\n- Cantidades aproximadas.\n- Estado visible de los recursos.\n- Información relevante para inventario.\n\nNo inventes elementos que no sean claramente visibles.\n\nSi no puedes determinar una cantidad exacta, utiliza expresiones como:\n- aproximadamente 5 unidades\n- varios\n- cantidad no determinada\n\nResponde únicamente con una descripción estructurada y clara de los recursos detectados.\n\nEjemplo:\n\nRecursos detectados:\n\n- 10 motores DC pequeños.\n- 4 drivers L298N.\n- Aproximadamente 20 tornillos M4.\n- 2 baterías recargables.\n- Caja organizadora de componentes.\n\nNo hagas recomendaciones ni expliques tu razonamiento.",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        352,
+        -144
+      ],
+      "id": "1be28125-40bc-4514-9cd7-de62c5eeceef",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "3vjKcJBNAyN77L0b",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $execution.id }}",
+        "tableName": "chat_memory"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        864,
+        208
+      ],
+      "id": "906f2836-5230-4d07-874a-b53768fe96de",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "W6nqEuzt97YIfok4",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres ReProyecta.\n\nTu función es ayudar a consultar recursos almacenados en el inventario de una organización orientada a proyectos.\n\nDispones de acceso a una base de datos con recursos registrados.\n\nReglas:\n\n- Utiliza siempre la información obtenida desde la base de datos.\n- No inventes datos.\n- Si no encuentras resultados, indícalo claramente.\n- Resume la información de forma clara y breve.\n- Incluye cantidades cuando estén disponibles.\n- Agrupa resultados similares.\n- Las respuestas deben ser adecuadas para Telegram.\n- No menciones tablas, SQL ni detalles técnicos internos.\n\nEjemplos:\n\nUsuario:\n¿Qué motores tenemos?\n\nRespuesta:\nActualmente hay disponibles:\n• 15 motores DC\n• 4 motores N20\n\nUsuario:\n¿Qué hay registrado?\n\nRespuesta:\nInventario disponible:\n• 15 motores DC\n• 4 motores N20\n• 12 sensores ultrasónicos\n• 3 baterías LiPo\n\nUsuario:\n¿Tenemos servomotores?\n\nRespuesta:\nNo encontré servomotores registrados en el inventario.\n\nTexto de entrada:  {{ $json.content.parts[0].text }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        768,
+        -16
+      ],
+      "id": "f459b966-7d5d-498c-9247-54c729807223",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.content.parts[0].text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        0
+      ],
+      "id": "0a190e4a-d015-422b-93b6-f77d6d0fdfa6",
+      "name": "Send a text message",
+      "webhookId": "3981140c-6a41-4d55-ad72-ae7d457b1642",
+      "credentials": {
+        "telegramApi": {
+          "id": "VXCzmp8UsYzY8zlb",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Eres el núcleo de decisión de ReProyecta.\n\nTu tarea es analizar el mensaje recibido y decidir si el usuario desea:\n\n1. Registrar recursos nuevos en el inventario.\n2. Consultar recursos existentes en el inventario.\n\nDebes responder EXCLUSIVAMENTE en formato JSON válido.\n\nAcciones permitidas:\n\nregistrar_recurso\nconsultar_inventario\n\nConsidera como registrar_recurso mensajes como:\n\n- Llegaron 10 motores DC\n- Guardar 20 tornillos M4\n- Tenemos 5 sensores ultrasónicos nuevos\n- Añadir una batería LiPo\n- Registrar sobrantes del proyecto Rover\n\nConsidera como consultar_inventario mensajes como:\n\n- ¿Cuántos motores tenemos?\n- ¿Qué sensores hay disponibles?\n- ¿Tenemos baterías?\n- Mostrar inventario\n- Buscar servomotores\n- ¿Qué hay registrado?\n\nRespuesta obligatoria:\n\n{\n  \"accion\": \"\",\n  \"recurso\": \"\",\n  \"cantidad\": null,\n  \"descripcion\": \"\",\n  \"confianza\": 0.0\n}\n\nReglas:\n\n- Si el usuario está registrando algo, extrae el recurso y la cantidad.\n- Si no se menciona cantidad, usa null.\n- Si es una consulta general, deja recurso vacío.\n- Si es una consulta específica, coloca el nombre del recurso.\n- Devuelve un valor de confianza entre 0 y 1.\n- No agregues explicaciones.\n- No uses markdown.\n- No escribas texto fuera del JSON.\nEl texto a analizar puede venir de un texto, de una imgaen o un audio, descrito por otro nodo a continuacion:\nTexto: {{ $json.message.text }}\nImagen:{{ $json.content.parts[0].text }}\nAudio: {{ $json.content.parts[0].text }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        496,
+        -16
+      ],
+      "id": "9a3a2fcc-df9b-410a-b944-6b89d2718c83",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "3vjKcJBNAyN77L0b",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Schema', ``, 'string') }}",
+          "mode": "name"
+        },
+        "table": {
+          "__rl": true,
+          "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Table', ``, 'string') }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.6,
+      "position": [
+        1008,
+        208
+      ],
+      "id": "e96aaf34-c299-4652-8ca0-3586423b8e4d",
+      "name": "Insert rows in a table in Postgres",
+      "credentials": {
+        "postgres": {
+          "id": "W6nqEuzt97YIfok4",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Extractor de Intención\n",
+        "height": 80
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        496,
+        -144
+      ],
+      "typeVersion": 1,
+      "id": "88cd0528-4ce3-4113-96b4-aba8454a1d47",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Agente ejecuta la operación\n",
+        "height": 80
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        768,
+        -112
+      ],
+      "typeVersion": 1,
+      "id": "ec6db542-c1ac-4e5c-a958-68aa66a1065d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "El mensaje llega en cualquier formato (Texto, audio, Imagen, Video)\n",
+        "height": 80,
+        "width": 288
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        144,
+        -240
+      ],
+      "typeVersion": 1,
+      "id": "92b2e514-3fd7-4201-8411-65a580e45502",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "Confirmación \n",
+        "height": 80
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1056,
+        -112
+      ],
+      "typeVersion": 1,
+      "id": "c3f1483c-a12c-4634-9477-b779344a278c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        720,
+        208
+      ],
+      "id": "e64385c8-52a7-4165-accb-f157319fd6d3",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "6VPuNvDUGyD4B3th",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get a file1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Analyze audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze audio": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file1": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table in Postgres": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "96bbf750-a745-4e46-ba18-db4859753c9a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "31297aa54d978681969f2dc41d4d4d8abd6d6809b24ea1071ae2da202989491e"
+  },
+  "nodeGroups": [],
+  "id": "VPlIikSlcDLquzVZ",
+  "tags": []
+}
