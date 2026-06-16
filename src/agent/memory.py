@@ -3,9 +3,9 @@ from langchain.memory import ConversationBufferWindowMemory
 
 class PostgresConversationMemory(ConversationBufferWindowMemory):
     def __init__(self, user_id: str, supabase, k: int = 10):
-        self.user_id = user_id
-        self.supabase = supabase
         super().__init__(memory_key="chat_history", k=k, return_messages=True)
+        object.__setattr__(self, "user_id", user_id)
+        object.__setattr__(self, "supabase", supabase)
         self._load_history()
 
     def _load_history(self):

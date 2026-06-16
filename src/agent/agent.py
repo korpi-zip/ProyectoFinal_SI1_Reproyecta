@@ -30,7 +30,7 @@ def get_agent_for_user(user_id: str):
             },
             verbose=True,
             handle_parsing_errors=True,
-            max_iterations=5,
+            max_iterations=3,
             max_execution_time=30,
         )
         _agents[user_id] = agent

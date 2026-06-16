@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 from concurrent.futures import ThreadPoolExecutor
 
 from telegram import Update
@@ -49,10 +50,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         agent = get_agent_for_user(user_id)
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         response = await loop.run_in_executor(_executor, agent.run, user_message)
         await update.message.reply_text(response, parse_mode="Markdown")
     except Exception as e:
+        print(f"\n❌ ERROR en handle_message (user={user_id}):")
+        traceback.print_exc()
         error_msg = (
             "Ocurrió un error al procesar tu solicitud. "
             "Por favor intenta nuevamente."
